@@ -1,0 +1,11 @@
+# checkout in dev. Values for the chart in checkout-app (module 07).
+image:
+  tag: "6.7.1"                 # promote by changing this line
+message: checkout (dev)
+replicas: 1
+database:
+  secretName: checkout-db      # created by secrets/dev/checkout-db.yaml (module 08)
+migration:
+  enabled: true                # module 10
+smokeTest:
+  enabled: true                # module 10

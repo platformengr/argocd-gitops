@@ -1,0 +1,19 @@
+# The platform team's project: Argo CD itself, add-ons, namespaces, projects.
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: platform
+  namespace: argocd
+spec:
+  description: Platform team. Argo CD, add-ons, namespaces, projects.
+  sourceRepos:
+    - https://github.com/YOUR_GITHUB_USER/argocd-platform.git
+    - https://argoproj.github.io/argo-helm
+    - https://traefik.github.io/charts
+    - https://bitnami.github.io/sealed-secrets
+  destinations:
+    - server: https://kubernetes.default.svc
+      namespace: '*'
+  clusterResourceWhitelist:
+    - group: '*'
+      kind: '*'

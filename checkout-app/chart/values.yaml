@@ -1,0 +1,33 @@
+# Defaults for every environment. Environment values (dev, prod) live in the
+# checkout-config repo and override these.
+nameOverride: ""            # the capstone reuses this chart as "catalog"
+
+image:
+  repository: ghcr.io/stefanprodan/podinfo
+  tag: ""                   # empty: use appVersion from Chart.yaml
+
+replicas: 1
+message: checkout
+progressDeadlineSeconds: 120   # report a failed rollout after 2 minutes
+
+resources:
+  requests: { cpu: 50m, memory: 64Mi }
+  limits: { memory: 128Mi }
+
+# Optional Kubernetes Secret with key "password" (a SealedSecret creates it).
+database:
+  secretName: ""
+
+# Module 10: deployment ordering
+migration:
+  enabled: false            # PreSync hook: runs before anything is applied
+  fail: false               # make the migration fail on purpose
+smokeTest:
+  enabled: false            # PostSync hook: runs after everything is healthy
+  path: /healthz            # what the smoke test requests
+
+# Module 11: the replica count is left to the autoscaler when enabled
+autoscaling:
+  enabled: false
+  minReplicas: 2
+  maxReplicas: 4

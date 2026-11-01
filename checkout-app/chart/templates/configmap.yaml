@@ -1,0 +1,10 @@
+# Wave -1: configuration exists before the Deployment that reads it.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "checkout.name" . }}-config
+  labels: {{- include "checkout.labels" . | nindent 4 }}
+  annotations:
+    argocd.argoproj.io/sync-wave: "-1"
+data:
+  PODINFO_UI_MESSAGE: {{ .Values.message | quote }}

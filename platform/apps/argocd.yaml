@@ -1,0 +1,36 @@
+# Argo CD manages itself: the upstream chart, pinned, with values from this repo.
+# Upgrading Argo CD is a pull request that changes targetRevision (module 06).
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: argocd
+  namespace: argocd
+spec:
+  project: platform
+  sources:
+    - repoURL: https://argoproj.github.io/argo-helm
+      chart: argo-cd
+      targetRevision: 10.11.6
+      helm:
+        releaseName: argocd          # same name as the first `helm install`
+        valueFiles:
+          - $values/argocd/values.yaml
+    - repoURL: https://github.com/YOUR_GITHUB_USER/argocd-platform.git
+      targetRevision: main
+      ref: values                    # makes $values point at this repo
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: argocd
+  # Passwords and the server key are written at runtime, never from Git.
+  ignoreDifferences:
+    - kind: Secret
+      name: argocd-secret
+      jsonPointers:
+        - /data
+  syncPolicy:
+    automated:
+      prune: false                   # never auto-delete parts of Argo CD itself
+      selfHeal: true
+    syncOptions:
+      - ServerSideApply=true         # the CRDs are too big for client-side apply
+      - RespectIgnoreDifferences=true   # and never overwrite argocd-secret's runtime data

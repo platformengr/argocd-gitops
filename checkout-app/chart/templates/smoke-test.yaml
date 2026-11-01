@@ -1,0 +1,38 @@
+{{- if .Values.smokeTest.enabled }}
+# PostSync hook: runs once every resource is synced and healthy. A failure
+# marks the sync failed, so a bad release is visible in Argo CD at once.
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "checkout.name" . }}-smoke-test
+  annotations:
+    argocd.argoproj.io/hook: PostSync
+    argocd.argoproj.io/hook-delete-policy: HookSucceeded
+spec:
+  backoffLimit: 1
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: smoke
+          image: curlimages/curl:8.11.1
+          args: ["-fsS", "--retry", "5", "--retry-connrefused", "http://{{ include "checkout.name" . }}{{ .Values.smokeTest.path }}"]
+---
+# SyncFail hook: runs only when the sync fails. Real teams post to a channel here.
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "checkout.name" . }}-sync-failed
+  annotations:
+    argocd.argoproj.io/hook: SyncFail
+    argocd.argoproj.io/hook-delete-policy: BeforeHookCreation
+spec:
+  backoffLimit: 0
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: notify
+          image: busybox:1.37.0
+          command: ["sh", "-c", "echo 'sync of {{ include "checkout.name" . }} failed: tell the owning team'"]
+{{- end }}

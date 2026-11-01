@@ -1,0 +1,4 @@
+# Platform repo review rules. Replace the handles with your teams.
+*                         @YOUR_GITHUB_USER
+# team-checkout may approve its own chart version bumps.
+/apps/checkout-*.yaml     @YOUR_GITHUB_USER

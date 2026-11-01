@@ -1,0 +1,17 @@
+# Namespaces for team-checkout. Platform-owned: the team deploys into them,
+# it cannot create, label or delete them (its project allows no Namespaces).
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: checkout-dev
+  labels:
+    team: checkout
+    env: dev
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: checkout-prod
+  labels:
+    team: checkout
+    env: prod

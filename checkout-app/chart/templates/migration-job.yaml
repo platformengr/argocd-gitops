@@ -1,0 +1,28 @@
+{{- if .Values.migration.enabled }}
+# PreSync hook: Argo CD runs this Job before applying anything else in the sync.
+# If it fails, the sync stops and the running version stays untouched.
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "checkout.name" . }}-migrate
+  annotations:
+    argocd.argoproj.io/hook: PreSync
+    argocd.argoproj.io/hook-delete-policy: BeforeHookCreation   # keep the last run's logs
+spec:
+  backoffLimit: 0
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: migrate
+          image: busybox:1.37.0
+          command: ["sh", "-c"]
+          args:
+            - |
+              echo "migrating schema for {{ include "checkout.name" . }} {{ .Values.image.tag | default .Chart.AppVersion }}"
+              sleep 5
+              {{- if .Values.migration.fail }}
+              echo "ERROR: column orders.total already exists" >&2; exit 1
+              {{- end }}
+              echo "migration done"
+{{- end }}

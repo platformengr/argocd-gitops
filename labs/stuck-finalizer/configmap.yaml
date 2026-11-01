@@ -1,0 +1,10 @@
+# Debug lab: a resource whose finalizer nobody will ever remove. Deleting the
+# Application that owns it hangs, because Argo CD waits for this object to go.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: legacy-config
+  finalizers:
+    - example.com/cleanup-database   # the controller for this was uninstalled long ago
+data:
+  owner: team-checkout

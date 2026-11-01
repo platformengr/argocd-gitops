@@ -1,0 +1,61 @@
+# Argo CD Helm values: the platform team's configuration of Argo CD itself.
+# The chart version is pinned in apps/argocd.yaml. Argo CD applies this file
+# to itself (module 04), so every change here is a commit, never `helm upgrade`.
+global:
+  domain: argocd.localtest.me
+
+configs:
+  params:
+    # TLS ends at the ingress controller (Traefik); Argo CD serves plain HTTP
+    # behind it. Only safe because nothing else can reach the server Service.
+    server.insecure: true
+
+  cm:
+    # Module 06: the shared admin account is off. People log in as themselves.
+    admin.enabled: false
+    accounts.alice: login            # platform team
+    accounts.checkout-dev: login     # team-checkout (module 09)
+    # Check Git every minute instead of every two: faster feedback on a laptop.
+    timeout.reconciliation: 60s
+    # Module 04: a banner on every UI page.
+    ui.bannercontent: "Course cluster: every change goes through Git"
+    # Module 10: Applications get a health status, so sync waves between
+    # Applications (app of apps) wait for the previous wave to be Healthy.
+    resource.customizations.health.argoproj.io_Application: |
+      hs = {}
+      hs.status = "Progressing"
+      hs.message = ""
+      if obj.status ~= nil and obj.status.health ~= nil then
+        hs.status = obj.status.health.status
+        if obj.status.health.message ~= nil then
+          hs.message = obj.status.health.message
+        end
+      end
+      return hs
+
+  rbac:
+    # Logged in but not listed below: see nothing.
+    policy.default: ""
+    policy.csv: |
+      # Platform team: everything.
+      g, alice, role:admin
+      # team-checkout: its own project only (module 09).
+      p, role:checkout-team, applications, get, checkout/*, allow
+      p, role:checkout-team, applications, sync, checkout/*, allow
+      p, role:checkout-team, applications, action/*, checkout/*, allow
+      p, role:checkout-team, logs, get, checkout/*, allow
+      p, role:checkout-team, projects, get, checkout, allow
+      g, checkout-dev, role:checkout-team
+
+server:
+  ingress:
+    enabled: true
+    ingressClassName: traefik
+    annotations:
+      # Serve on Traefik's HTTPS entrypoint with its default certificate.
+      traefik.ingress.kubernetes.io/router.entrypoints: websecure
+      traefik.ingress.kubernetes.io/router.tls: "true"
+
+# No SSO on a laptop. In production, configure OIDC or Dex here (module 06).
+dex:
+  enabled: false

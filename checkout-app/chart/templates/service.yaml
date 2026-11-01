@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "checkout.name" . }}
+  labels: {{- include "checkout.labels" . | nindent 4 }}
+spec:
+  selector:
+    app.kubernetes.io/name: {{ include "checkout.name" . }}
+  ports:
+    - name: http
+      port: 80
+      targetPort: http

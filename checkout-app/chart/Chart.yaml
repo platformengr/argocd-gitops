@@ -1,0 +1,7 @@
+apiVersion: v2
+name: checkout
+description: team-checkout's service, packaged by the team that builds it.
+type: application
+# Released by tagging this repo: git tag v1.0.0. Argo CD pins the tag.
+version: 1.0.0
+appVersion: "6.7.0"

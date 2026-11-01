@@ -1,0 +1,15 @@
+# One kind cluster for the whole course. Traefik (module 05) listens on fixed
+# NodePorts; these mappings make them reachable from your laptop:
+#   https://argocd.localtest.me:8443   (*.localtest.me resolves to 127.0.0.1)
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+name: argocd
+nodes:
+  - role: control-plane
+    extraPortMappings:
+      - containerPort: 30443   # Traefik websecure (HTTPS)
+        hostPort: 8443
+        protocol: TCP
+      - containerPort: 30080   # Traefik web (HTTP)
+        hostPort: 8088
+        protocol: TCP

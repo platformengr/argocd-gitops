@@ -1,0 +1,14 @@
+# checkout in prod.
+image:
+  tag: "6.7.0"
+message: checkout (prod)
+replicas: 2
+resources:
+  requests: { cpu: 100m, memory: 96Mi }
+  limits: { memory: 192Mi }
+database:
+  secretName: checkout-db
+migration:
+  enabled: true
+smokeTest:
+  enabled: true

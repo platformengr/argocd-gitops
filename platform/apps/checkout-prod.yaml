@@ -1,0 +1,36 @@
+# team-checkout in prod. Three sources, one application:
+#   the chart from the application repo, at a release tag,
+#   the values for prod from the environment repo,
+#   the sealed secrets for prod from the environment repo.
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: checkout-prod
+  namespace: argocd
+  labels:
+    team: checkout
+    env: prod
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io   # deleting the app deletes what it deployed
+spec:
+  project: checkout
+  sources:
+    - repoURL: https://github.com/YOUR_GITHUB_USER/checkout-app.git
+      path: chart
+      targetRevision: v1.0.0        # a release of the chart, owned by team-checkout
+      helm:
+        valueFiles:
+          - $config/helm/prod.yaml
+    - repoURL: git@github.com:YOUR_GITHUB_USER/checkout-config.git
+      targetRevision: main
+      ref: config
+    - repoURL: git@github.com:YOUR_GITHUB_USER/checkout-config.git
+      targetRevision: main
+      path: secrets/prod
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: checkout-prod
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true

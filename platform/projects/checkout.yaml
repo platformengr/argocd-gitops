@@ -1,0 +1,40 @@
+# team-checkout's boundary: which repos it may deploy from, where to, and what.
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: checkout
+  namespace: argocd
+spec:
+  description: team-checkout. Only its own repos, only its own namespaces.
+  sourceRepos:
+    - https://github.com/YOUR_GITHUB_USER/checkout-app.git
+    - git@github.com:YOUR_GITHUB_USER/checkout-config.git
+  destinations:
+    - server: https://kubernetes.default.svc
+      namespace: checkout-dev
+    - server: https://kubernetes.default.svc
+      namespace: checkout-prod
+  # Nothing cluster-wide: no Namespaces, ClusterRoles, CRDs.
+  clusterResourceWhitelist: []
+  # Inside its namespaces, nothing the platform owns.
+  namespaceResourceBlacklist:
+    - group: ''
+      kind: ResourceQuota
+    - group: ''
+      kind: LimitRange
+    - group: networking.k8s.io
+      kind: NetworkPolicy
+    - group: rbac.authorization.k8s.io
+      kind: Role
+    - group: rbac.authorization.k8s.io
+      kind: RoleBinding
+  # Warn about objects in these namespaces that no Application manages.
+  orphanedResources:
+    warn: true
+  # Project roles: tokens for automation (CI) scoped to this project.
+  roles:
+    - name: ci
+      description: CI may sync checkout apps, nothing else.
+      policies:
+        - p, proj:checkout:ci, applications, get, checkout/*, allow
+        - p, proj:checkout:ci, applications, sync, checkout/*, allow

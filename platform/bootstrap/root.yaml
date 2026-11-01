@@ -1,0 +1,20 @@
+# The root Application ("app of apps"). Applied once with kubectl (module 04);
+# after that, every Application is a file in apps/ and Argo CD creates it.
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: root
+  namespace: argocd
+spec:
+  project: platform
+  source:
+    repoURL: https://github.com/YOUR_GITHUB_USER/argocd-platform.git
+    targetRevision: main
+    path: apps
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: argocd
+  syncPolicy:
+    automated:
+      prune: true      # delete a file in apps/, the Application goes
+      selfHeal: true

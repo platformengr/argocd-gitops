@@ -1,0 +1,20 @@
+# Product namespaces are platform-owned: labels, and later quota and policies.
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: namespaces
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "-2"
+spec:
+  project: platform
+  source:
+    repoURL: https://github.com/YOUR_GITHUB_USER/argocd-platform.git
+    targetRevision: main
+    path: namespaces
+  destination:
+    server: https://kubernetes.default.svc
+  syncPolicy:
+    automated:
+      prune: false     # removing a namespace deletes everything in it
+      selfHeal: true
