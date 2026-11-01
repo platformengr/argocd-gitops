@@ -1,6 +1,5 @@
 # Argo CD Helm values: the platform team's configuration of Argo CD itself.
-# The chart version is pinned in apps/argocd.yaml. Argo CD applies this file
-# to itself (module 04), so every change here is a commit, never `helm upgrade`.
+# Every change here is a commit, reviewed like code.
 global:
   domain: argocd.localtest.me
 
@@ -56,6 +55,6 @@ server:
       traefik.ingress.kubernetes.io/router.entrypoints: websecure
       traefik.ingress.kubernetes.io/router.tls: "true"
 
-# No SSO on a laptop. In production, configure OIDC or Dex here (module 06).
+# No SSO on a laptop. In production, configure OIDC or Dex here.
 dex:
   enabled: false
