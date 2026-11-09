@@ -16,7 +16,7 @@ for f in sorted(glob.glob("**/*.yaml", recursive=True)):
     for d in docs:
         kind = d.get("kind")
         if kind == "Secret":
-            print(f"FAIL {f}: plain Secret in Git; seal it (module 08)"); bad += 1
+            print(f"FAIL {f}: plain Secret in Git; put the value in the store and commit an ExternalSecret (module 08)"); bad += 1
         if kind == "Application":
             spec = d.get("spec", {})
             if not spec.get("project"):

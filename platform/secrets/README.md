@@ -1,9 +1,11 @@
-# Sealed repository credentials
+# Repository credentials
 
-`kubeseal` output for repository Secrets goes here, one file per repository
-(module 08). A SealedSecret only decrypts in the cluster whose key sealed it, so
-this folder is empty in the reference: you generate your own.
+One ExternalSecret per private repository (module 08). Each one reads a deploy
+key from the platform store (`store-platform`) and builds the Secret Argo CD
+looks for: labelled `argocd.argoproj.io/secret-type: repository`, with `type`,
+`url` and `sshPrivateKey`.
 
-    secrets/repo-checkout-config.yaml   # SealedSecret -> Secret argocd/repo-checkout-config
+    secrets/repo-checkout-config.yaml   # ExternalSecret -> Secret argocd/repo-checkout-config
 
-Never commit the private key, the plain Secret, or `kubectl create secret ... -o yaml` output.
+The file is a reference, not a secret: safe to commit. Never commit the private
+key, a plain Secret, or `kubectl create secret ... -o yaml` output.

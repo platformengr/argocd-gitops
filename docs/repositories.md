@@ -4,7 +4,7 @@
 | --- | --- | --- | --- |
 | Example | `checkout-app` | `checkout-config` | `argocd-platform` |
 | Owner | The product team | The product team | The platform team |
-| Holds | Source, tests, CI, Helm chart | Values per environment, sealed secrets | Argo CD config, Applications, AppProjects, namespaces, add-ons |
+| Holds | Source, tests, CI, Helm chart | Values per environment, ExternalSecrets (references, never values) | Argo CD config, Applications, AppProjects, namespaces, add-ons |
 | Changes | Every code change; released by tag | Every deploy and promotion | Onboarding, access, upgrades |
 | Argo CD reads | One tag (`v1.0.0`) | `main` | `main` |
 | Who can break prod | A release, only once an environment points at it | A merged pull request | Anything: highest blast radius |

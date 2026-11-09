@@ -1,7 +1,7 @@
 # team-checkout in dev. Three sources, one application:
 #   the chart from the application repo, at a release tag,
 #   the values for dev from the environment repo,
-#   the sealed secrets for dev from the environment repo.
+#   the ExternalSecrets for dev from the environment repo.
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:

@@ -10,7 +10,7 @@ spec:
     - https://github.com/YOUR_GITHUB_USER/argocd-platform.git
     - https://argoproj.github.io/argo-helm
     - https://traefik.github.io/charts
-    - https://bitnami.github.io/sealed-secrets
+    - https://charts.external-secrets.io
   destinations:
     - server: https://kubernetes.default.svc
       namespace: '*'

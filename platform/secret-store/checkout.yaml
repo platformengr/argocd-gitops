@@ -1,0 +1,61 @@
+# team-checkout's secret store: values for its apps in dev and prod.
+# On kind the "vault" is the namespace store-checkout: you put values there with
+# kubectl, never in Git. In production this is a real vault (AWS Secrets
+# Manager, Azure Key Vault, OpenBao) reached with workload identity.
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: store-checkout
+  labels:
+    team: checkout
+---
+# The identity External Secrets uses to read this store, and nothing else.
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: eso-reader
+  namespace: store-checkout
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: eso-reader
+  namespace: store-checkout
+rules:
+  - apiGroups: [""]
+    resources: [secrets]
+    verbs: [get, list, watch]
+  - apiGroups: [authorization.k8s.io]
+    resources: [selfsubjectrulesreviews]
+    verbs: [create]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: eso-reader
+  namespace: store-checkout
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: eso-reader
+subjects:
+  - kind: ServiceAccount
+    name: eso-reader
+    namespace: store-checkout
+---
+apiVersion: external-secrets.io/v1
+kind: ClusterSecretStore
+metadata:
+  name: checkout
+spec:
+  # Who may read from this store. An ExternalSecret anywhere else is refused.
+  conditions:
+    - namespaces: [checkout-dev, checkout-prod]
+  provider:
+    kubernetes:
+      remoteNamespace: store-checkout
+      server:
+        url: https://kubernetes.default.svc
+        caProvider: { type: ConfigMap, name: kube-root-ca.crt, key: ca.crt, namespace: store-checkout }
+      auth:
+        serviceAccount: { name: eso-reader, namespace: store-checkout }

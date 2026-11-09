@@ -14,7 +14,7 @@ resources:
   requests: { cpu: 50m, memory: 64Mi }
   limits: { memory: 128Mi }
 
-# Optional Kubernetes Secret with key "password" (a SealedSecret creates it).
+# Optional Kubernetes Secret with key "password" (an ExternalSecret creates it).
 database:
   secretName: ""
 

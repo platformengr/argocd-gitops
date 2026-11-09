@@ -1,5 +1,5 @@
-# Sealed secrets for checkout-prod
+# Secrets for checkout-prod
 
-`kubeseal` output goes here (module 08), for example `checkout-db.yaml`: a
-SealedSecret that becomes the Secret `checkout-db` in namespace `checkout-prod`.
-It only decrypts in the cluster that sealed it, so the reference has none.
+ExternalSecrets for namespace `checkout-prod` (module 08). `checkout-db.yaml`
+builds the Secret `checkout-db` from `db-prod` in team-checkout's store
+(`store-checkout`). Git holds the reference, never the value.

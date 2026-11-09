@@ -6,10 +6,10 @@
 | --- | --- | --- |
 | Argo CD install, upgrades, exposure, SSO, RBAC | Owns | Uses |
 | AppProject `checkout`, namespaces, quotas | Owns | Requests changes by pull request |
-| Repository credentials (deploy keys) | Seals and commits | Adds the deploy key to its repo |
+| Secret stores, repository credentials (deploy keys) | Owns the stores; puts the key in the platform store, commits the ExternalSecret | Adds the deploy key to its repo |
 | `apps/checkout-*.yaml` (which chart release runs) | Reviews | Proposes (CODEOWNERS) |
 | Chart in `checkout-app` | | Owns, releases by tag |
-| Values and sealed secrets in `checkout-config` | | Owns |
+| Values and ExternalSecrets in `checkout-config`; the values in its own store | | Owns |
 | Sync, refresh, rollback of checkout apps | Can | Can, in its own project |
 
 ## How the product team deploys
